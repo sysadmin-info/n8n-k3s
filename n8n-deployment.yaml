@@ -1,0 +1,44 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: n8n-deployment
+  namespace: n8n
+  labels: &labels
+    app: n8n
+    component: deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels: *labels
+  template:
+    metadata:
+      labels: *labels
+    spec:
+      containers:
+      - name: n8n
+        image: n8nio/n8n:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - name: http
+          containerPort: 5678
+        envFrom:
+        - configMapRef:
+            name: n8n-configmap
+        - secretRef:
+            name: n8n-secrets
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 5678
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: 5678
+        resources:
+          limits:
+            cpu: "1.0"
+            memory: "1024Mi"
+          requests:
+            cpu: "0.5"
+            memory: "512Mi"
