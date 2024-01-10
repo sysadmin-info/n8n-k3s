@@ -1,0 +1,16 @@
+---
+- name: Install git on Master Node
+  hosts: master
+  become: no
+  tasks:
+    - name: Install git
+      shell: sudo apt install git
+
+    - name: Clone the repository 
+      shell: git clone https://github.com/sysadmin-info/n8n-k3s.git
+
+    - name: Create namespace
+      shell: kubectl create namespace n8n
+
+    - name: Deploy n8n in k3s 
+      shell: cd /home/ansible/n8n-k3s && kubectl apply -f n8n-configmap.yaml -f n8n-deployment.yaml -f n8n-secrets.yaml -f n8n-service.yaml -f postgres-secrets.yaml -f postgres-service.yaml -f postgres-statefulset.yaml
